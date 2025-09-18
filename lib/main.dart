@@ -43,16 +43,42 @@ class _HomePageState extends State<HomePage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                // Reemplaza por tus assets o por NetworkImage
-                Image.network(
-                  'https://raw.githubusercontent.com/Klerith/mas-talento/refs/heads/main/angular/angular-logo.png',
+                Container(
                   width: 100,
                   height: 100,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: NetworkImage(
+                        'https://raw.githubusercontent.com/Klerith/mas-talento/refs/heads/main/angular/angular-logo.png',
+                      ),
+                    ),
+                  ),
                 ),
-                Image.asset(
-                  'assets/img/springboot.png',
+                Container(
                   width: 100,
                   height: 100,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage('assets/img/springboot.png'),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            ListView(
+              shrinkWrap: true,
+              children: const [
+                ListTile(
+                  leading: Icon(Icons.check),
+                  title: Text('Desarrollador Backend'),
+                ),
+                ListTile(
+                  leading: Icon(Icons.check),
+                  title: Text('Desarrollador Frontend'),
+                ),
+                ListTile(
+                  leading: Icon(Icons.check),
+                  title: Text('Desarrollador Mobile'),
                 ),
               ],
             ),
