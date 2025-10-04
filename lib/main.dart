@@ -2,16 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'screens/home_screen.dart';
 import 'screens/detail_screen.dart';
+import 'screens/timer_screen.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 final GoRouter _router = GoRouter(
   routes: [
     GoRoute(
       path: '/',
-      builder: (context, state) => HomeScreen(),
+      builder: (context, state) => const HomeScreen(),
       routes: [
         GoRoute(
           path: 'detail/:value',
@@ -19,6 +20,10 @@ final GoRouter _router = GoRouter(
             final value = state.pathParameters['value']!;
             return DetailScreen(value: value);
           },
+        ),
+         GoRoute(
+          path: 'timer',
+          builder: (context, state) => const TimerScreen(),
         ),
       ],
     ),
@@ -34,6 +39,7 @@ class MyApp extends StatelessWidget {
       routerConfig: _router,
       title: 'Demo GoRouter',
       theme: ThemeData(primarySwatch: Colors.blue),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
