@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'screens/home_screen.dart';
 import 'screens/detail_screen.dart';
 import 'screens/timer_screen.dart';
+import 'screens/isolate_screen.dart'; // Importar la nueva pantalla
 
 void main() {
   runApp(const MyApp());
@@ -21,9 +22,13 @@ final GoRouter _router = GoRouter(
             return DetailScreen(value: value);
           },
         ),
-         GoRoute(
+        GoRoute(
           path: 'timer',
           builder: (context, state) => const TimerScreen(),
+        ),
+        GoRoute( // ruta para el Isolate
+          path: 'isolate',
+          builder: (context, state) => const IsolateScreen(),
         ),
       ],
     ),

@@ -224,6 +224,12 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
+           FloatingActionButton(
+            heroTag: 'isolate',
+            child: const Icon(Icons.memory),
+            onPressed: () => context.push('/isolate'),
+          ),
+          const SizedBox(height: 12),
           FloatingActionButton(
             heroTag: 'timer',
             child: const Icon(Icons.timer),
