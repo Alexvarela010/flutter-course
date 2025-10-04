@@ -1,45 +1,72 @@
-# talleres
+# Talleres Flutter: Conceptos Avanzados
 
-A new Flutter project.
+Este proyecto es una aplicación de Flutter diseñada para demostrar conceptos clave de programación asíncrona y manejo de ciclo de vida, utilizando `go_router` para la navegación.
 
-## Getting Started
+## Conceptos de Asincronía en Flutter
 
-This project is a starting point for a Flutter application.
+### 1. Asincronía con `Future` / `async` / `await`
 
-A few resources to get you started if this is your first Flutter project:
+- **Cuándo usarlo:** Para operaciones de I/O (entrada/salida) que toman tiempo pero no consumen mucho CPU, como peticiones HTTP, acceso a bases de datos o lectura de archivos. `Future` permite que la aplicación continúe ejecutándose sin bloquear el hilo principal (UI).
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- **Implementación:**
+  - Se creó un `DataService` que simula una consulta a un servidor con un `Future.delayed` de 3 segundos.
+  - La pantalla `HomeScreen` (en la pestaña **Async**) utiliza `async/await` para esperar el resultado.
+  - La interfaz muestra tres estados claramente definidos:
+    1.  **Cargando:** Mientras el `Future` está en progreso.
+    2.  **Éxito:** Si el `Future` se completa correctamente.
+    3.  **Error:** Si el `Future` falla.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### 2. Temporizador con `Timer`
 
-# Ejercicio Flutter: go_router, Widgets y Ciclo de Vida
+- **Cuándo usarlo:** Para ejecutar una acción repetidamente en intervalos de tiempo regulares. Es ideal para cronómetros, cuentas regresivas, animaciones o tareas periódicas como *polling*.
 
-## Arquitectura y Navegación
+- **Implementación:**
+  - Se desarrolló `TimerScreen`, una pantalla dedicada a un cronómetro.
+  - Un `Timer.periodic` actualiza la UI cada 100 milisegundos.
+  - Se implementaron controles para **Iniciar, Pausar, Reanudar y Reiniciar** el cronómetro.
+  - Es fundamental llamar a `_timer?.cancel()` en el método `dispose` para liberar los recursos y evitar fugas de memoria cuando se abandona la pantalla.
+
+### 3. Tareas Pesadas con `Isolate`
+
+- **Cuándo usarlo:** Para operaciones que consumen mucho CPU (CPU-bound), como procesar imágenes grandes, realizar cálculos matemáticos complejos o parsear un JSON muy extenso. `Isolate` ejecuta la tarea en un hilo completamente separado, con su propia memoria, evitando que la UI se congele.
+
+- **Implementación:**
+  - Se creó la pantalla `IsolateScreen` para ejecutar una tarea pesada (una suma iterativa gigante).
+  - La función `heavyTask` se ejecuta en un nuevo hilo gracias a `Isolate.spawn`.
+  - La comunicación entre el hilo principal y el `Isolate` se realiza mediante `ReceivePort` y `SendPort`, permitiendo enviar el resultado de vuelta a la UI sin bloquearla.
+  - La UI muestra el estado del cómputo y el resultado final.
+
+## Flujo de la Aplicación y Pantallas
+
+La navegación se gestiona con `go_router`.
+
+1.  **Pantalla Principal (`/`)**
+    - Contiene una `TabBar` con tres pestañas: **Home**, **Grid** y **Async** (demostración de `Future`).
+    - Dispone de `FloatingActionButtons` para navegar a las siguientes pantallas:
+      - **Cómputo con Isolate (`/isolate`):** Botón con ícono de chip.
+      - **Cronómetro (`/timer`):** Botón con ícono de reloj.
+
+2.  **Pantalla de Cronómetro (`/timer`)**
+    - Muestra un cronómetro funcional con controles para iniciar, pausar, reanudar y reiniciar.
+
+3.  **Pantalla de Cómputo Pesado (`/isolate`)**
+    - Permite iniciar una tarea que consume mucho CPU en un hilo separado, mostrando el progreso sin congelar la aplicación.
+
+---
+
+## Ejercicio Anterior: go_router, Widgets y Ciclo de Vida
 
 - **Rutas:**
   - `/` : Pantalla principal (`HomeScreen`)
   - `/detail/:value` : Pantalla secundaria (`DetailScreen`) que recibe un parámetro `value`.
 
-- **Envío de parámetros:**
-  - El parámetro `value` se pasa en la URL al navegar a `/detail/:value`.
-  - Se accede en la pantalla secundaria mediante `state.params['value']`.
-
 - **Navegación con go_router:**
-  - `context.go('/detail/123')`: Reemplaza la ruta actual (no se puede volver atrás).
-  - `context.push('/detail/456')`: Agrega la ruta a la pila (se puede volver atrás).
-  - `context.replace('/detail/789')`: Reemplaza la ruta actual (similar a go, pero mantiene el historial).
+  - `context.go()`: Reemplaza la ruta actual.
+  - `context.push()`: Agrega la ruta a la pila.
+  - `context.replace()`: Reemplaza la ruta actual manteniendo el historial.
 
-## Widgets Usados
+- **Widgets Usados:**
+  - `GridView`, `TabBar`, `TabBarView`, `ListView`, `FloatingActionButton`.
 
-- **GridView:** Muestra una cuadrícula de elementos en la pantalla principal. Permite visualizar listas de forma eficiente.
-- **TabBar y TabBarView:** Permiten navegar entre secciones dentro de la pantalla principal, mejorando la organización de la UI.
-- **ListView:** Como tercer widget, muestra una lista simple en el segundo tab.
-- **FloatingActionButton:** Se usan tres para demostrar los diferentes métodos de navegación.
-
-## Ciclo de Vida
-
-- Se imprime en consola la ejecución de `initState`, `didChangeDependencies`, `build`, `setState` y `dispose` en ambas pantallas.
-- Cada método tiene un comentario breve explicando cuándo y por qué se llama.
+- **Ciclo de Vida:**
+  - Se imprime en consola la ejecución de `initState`, `didChangeDependencies`, `build`, y `dispose`.
