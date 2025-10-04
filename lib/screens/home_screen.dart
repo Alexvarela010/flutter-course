@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../services/data_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -7,6 +8,7 @@ class HomeScreen extends StatefulWidget {
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
+
 // Widget para el primer tab (contenido de HomePage adaptado)
 class _HomeTab extends StatefulWidget {
   @override
@@ -18,9 +20,7 @@ class _HomeTabState extends State<_HomeTab> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(title)),
-      body: Padding(
+    return Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -37,7 +37,7 @@ class _HomeTabState extends State<_HomeTab> {
                 Container(
                   width: 100,
                   height: 100,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     image: DecorationImage(
                       image: NetworkImage(
                         'https://raw.githubusercontent.com/Klerith/mas-talento/refs/heads/main/angular/angular-logo.png',
@@ -48,7 +48,7 @@ class _HomeTabState extends State<_HomeTab> {
                 Container(
                   width: 100,
                   height: 100,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     image: DecorationImage(
                       image: AssetImage('assets/img/springboot.png'),
                     ),
@@ -56,23 +56,23 @@ class _HomeTabState extends State<_HomeTab> {
                 ),
               ],
             ),
-            ListView(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              children: const [
-                ListTile(
-                  leading: Icon(Icons.check),
-                  title: Text('Desarrollador Backend'),
-                ),
-                ListTile(
-                  leading: Icon(Icons.check),
-                  title: Text('Desarrollador Frontend'),
-                ),
-                ListTile(
-                  leading: Icon(Icons.check),
-                  title: Text('Desarrollador Mobile'),
-                ),
-              ],
+            Expanded(
+              child: ListView(
+                children: const [
+                  ListTile(
+                    leading: Icon(Icons.check),
+                    title: Text('Desarrollador Backend'),
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.check),
+                    title: Text('Desarrollador Frontend'),
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.check),
+                    title: Text('Desarrollador Mobile'),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 24),
             ElevatedButton(
@@ -83,10 +83,75 @@ class _HomeTabState extends State<_HomeTab> {
                       : 'Hola, Flutter';
                 });
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Título actualizado')),
+                  const SnackBar(content: Text('Título actualizado (no visible en AppBar)')),
                 );
               },
               child: const Text('Cambiar título'),
+            ),
+          ],
+        ),
+      );
+  }
+}
+
+class _AsyncTab extends StatefulWidget {
+  const _AsyncTab({super.key});
+
+  @override
+  State<_AsyncTab> createState() => _AsyncTabState();
+}
+
+class _AsyncTabState extends State<_AsyncTab> {
+  final DataService _dataService = DataService();
+  String _dataState = 'Sin datos';
+  String? _data;
+  String? _error;
+
+  Future<void> _fetchData() async {
+    print('Antes de la llamada asíncrona.');
+    setState(() {
+      _dataState = 'Cargando...';
+      _data = null;
+      _error = null;
+    });
+
+    try {
+      print('Durante la espera del Future...');
+      final data = await _dataService.fetchData();
+      setState(() {
+        _dataState = 'Éxito';
+        _data = data;
+      });
+      print('Después de la llamada asíncrona (Éxito).');
+    } catch (e) {
+      setState(() {
+        _dataState = 'Error';
+        _error = e.toString();
+      });
+       print('Después de la llamada asíncrona (Error).');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Estado: $_dataState', style: Theme.of(context).textTheme.headlineSmall),
+            const SizedBox(height: 20),
+            if (_dataState == 'Cargando...')
+              const CircularProgressIndicator()
+            else if (_data != null)
+              Text(_data!, textAlign: TextAlign.center, style: const TextStyle(fontSize: 16))
+            else if (_error != null)
+              Text(_error!, textAlign: TextAlign.center, style: const TextStyle(color: Colors.red, fontSize: 16)),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _fetchData,
+              child: const Text('Consultar Datos'),
             ),
           ],
         ),
@@ -95,12 +160,12 @@ class _HomeTabState extends State<_HomeTab> {
   }
 }
 
+
 class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
   void initState() {
-    // Se llama una vez al crear el widget.
     print('HomeScreen: initState');
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
@@ -108,37 +173,33 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
   @override
   void didChangeDependencies() {
-    // Se llama cuando el widget depende de un InheritedWidget.
     print('HomeScreen: didChangeDependencies');
     super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Se llama cada vez que se construye el widget.
     print('HomeScreen: build');
     return Scaffold(
       appBar: AppBar(
-        title: Text('Pantalla Principal'),
+        title: const Text('Pantalla Principal'),
         bottom: TabBar(
           controller: _tabController,
-          tabs: [
+          tabs: const [
             Tab(text: 'Home'),
             Tab(text: 'Grid'),
-            Tab(text: 'Otro'),
+            Tab(text: 'Async'),
           ],
         ),
       ),
       body: TabBarView(
         controller: _tabController,
         children: [
-          // Primer tab: Home
           _HomeTab(),
 
-        // Segundo tab: GridView
           GridView.builder(
-            padding: EdgeInsets.all(16),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            padding: const EdgeInsets.all(16),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
               mainAxisSpacing: 8,
               crossAxisSpacing: 8,
@@ -148,7 +209,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               return GestureDetector(
                 onTap: () {
                   print('HomeScreen: setState (al tocar item)');
-                  setState(() {}); // Solo para evidenciar setState
+                  // setState(() {}); // This setState is in the parent, not ideal.
                 },
                 child: Card(
                   child: Center(child: Text('Elemento $index')),
@@ -156,41 +217,46 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               );
             },
           ),
-          // Tercer tab: Widget adicional (ListView)
-          ListView(
-            children: [
-              ListTile(title: Text('Elemento A')),
-              ListTile(title: Text('Elemento B')),
-            ],
-          ),
+          
+          const _AsyncTab(),
         ],
       ),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
+           FloatingActionButton(
+            heroTag: 'isolate',
+            child: const Icon(Icons.memory),
+            onPressed: () => context.push('/isolate'),
+          ),
+          const SizedBox(height: 12),
+          FloatingActionButton(
+            heroTag: 'timer',
+            child: const Icon(Icons.timer),
+            onPressed: () => context.push('/timer'),
+          ),
+          const SizedBox(height: 12),
+
           FloatingActionButton.extended(
             heroTag: 'go',
-            label: Text('go'),
+            label: const Text('go'),
             onPressed: () {
-              // Navega y reemplaza la ruta actual.
               context.go('/detail/go');
             },
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           FloatingActionButton.extended(
             heroTag: 'push',
-            label: Text('push'),
+            label: const Text('push'),
             onPressed: () {
-              // Navega y agrega a la pila.
               context.push('/detail/push');
             },
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           FloatingActionButton.extended(
             heroTag: 'replace',
-            label: Text('replace'),
+            label: const Text('replace'),
             onPressed: () {
-              // Reemplaza la ruta actual.
               context.replace('/detail/replace');
             },
           ),
@@ -201,12 +267,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
   @override
   void dispose() {
-    // Se llama al destruir el widget.
     print('HomeScreen: dispose');
     _tabController.dispose();
     super.dispose();
   }
-
 }
-
-
