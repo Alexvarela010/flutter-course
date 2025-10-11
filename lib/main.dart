@@ -4,7 +4,8 @@ import 'screens/home_screen.dart';
 import 'screens/detail_screen.dart';
 import 'screens/timer_screen.dart';
 import 'screens/isolate_screen.dart'; 
-import 'screens/meal_list_screen.dart'; // Importar la nueva pantalla de listado
+import 'screens/meal_list_screen.dart';
+import 'screens/meal_detail_screen.dart'; // Importar la pantalla de detalle
 
 void main() {
   runApp(const MyApp());
@@ -14,7 +15,7 @@ final GoRouter _router = GoRouter(
   initialLocation: '/meals', // Definimos la nueva ruta inicial
   routes: [
     GoRoute(
-      path: '/', // La ruta antigua sigue disponible si se necesita
+      path: '/',
       builder: (context, state) => const HomeScreen(),
       routes: [
         GoRoute(
@@ -40,13 +41,13 @@ final GoRouter _router = GoRouter(
       builder: (context, state) => const MealListScreen(),
       routes: [
         // Ruta para el detalle que crearemos después
-        // GoRoute(
-        //   path: ':id',
-        //   builder: (context, state) {
-        //     final id = state.pathParameters['id']!;
-        //     return MealDetailScreen(mealId: id);
-        //   },
-        // ),
+        GoRoute(
+          path: ':id', // Recibe el ID como parámetro de ruta
+          builder: (context, state) {
+            final id = state.pathParameters['id']!;
+            return MealDetailScreen(mealId: id);
+          },
+        ),
       ],
     ),
   ],

@@ -93,9 +93,8 @@ class _MealListScreenState extends State<MealListScreen> {
                   title: Text(meal.name, style: const TextStyle(fontWeight: FontWeight.bold)),
                   subtitle: Text(meal.category ?? 'Sin categoría'),
                   onTap: () {
-                    // Navegación a la pantalla de detalle (la implementaremos después)
-                    print('Navegar a detalle de ${meal.id}');
-                     // context.go('/meals/${meal.id}');
+                    // Navegación a la pantalla de detalle
+                     context.go('/meals/${meal.id}');
                   },
                 ),
               );
